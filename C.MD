@@ -1,31 +1,44 @@
-# Configuration Instructions
+# Usage
 
-Before running the code, you will need to set up the necessary API keys and authentication credentials. This can be done by modifying the `credentials.ini` file located in the `config` folder. 
+This script can be used to automate various Spotify tasks.
 
-The `credentials.ini` file should have the following structure:
+## Getting started
 
-| Key | Value |
-| --- | --- |
-| 'client_id' | '' |
-| 'client_secret' | '' |
-| 'access_token' | '' |
+Before running the script, you need to set up the necessary credentials in the `config/credentials.ini` file. The `client_id` and `client_secret` are for Spotify, and the `access_token` is for LyricsGenius.
 
-*Note: The `client_id` and `client_secret` values should be obtained from Spotify, while the `access_token` value should be obtained from LyricsGenius.*
+## Running the script
+
+To run the script, simply execute the `main.py` file with the desired arguments.
+
+### Arguments
+
+The script takes the following arguments:
+
+- `-ps`, `--playlists`: get all playlists attributes.
+- `-s`, `--songs <playlist_name>`: get all songs from a specific playlist.
+- `-l`, `--lyrics`: get the lyrics for the user's currently playing track.
+
+### Examples
+
+Get all playlist attributes:
+
+Here's an example of how you can use the `main.py` script:
+
+```bash
+python3 main.py -ps
+```
+
+This will print a table with all your playlists attributes.
 
 
+Get all songs from a specific playlist:
 
-To obtain your own API keys and credentials, follow these steps:
 
-1. Create a Spotify Developer account and register a new application: https://developer.spotify.com/dashboard/applications
+```bash
+python3 main.py -s <playlist_name>
+```
 
-2. Note down your `client_id` and `client_secret` from the Spotify Developer Dashboard.
-
-3. Create a Genius account and register a new API Client: https://genius.com/api-clients/new
-
-4. Note down your `access_token` from the Genius API Dashboard.
-
-5. Paste your API keys and credentials in the `credentials.ini` file in the `config` folder.
-
-6. Save the `credentials.ini` file.
-
-Once you have completed these steps, you are ready to run the code!
+Get lyrics for the user's currently playing track:
+```bash
+python3 main.py -l
+```
