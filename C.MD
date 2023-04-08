@@ -1,6 +1,5 @@
 # Auto Spotify
-{% include button.html url="http://www.google.com" %}
-
+[Click me](http://www.google.com){: .btn}
 Auto Spotify is a Python library for automating various tasks on Spotify. It is built on top of the Spotipy library and uses the Spotify Web API to interact with Spotify.
 
 ## Installation
