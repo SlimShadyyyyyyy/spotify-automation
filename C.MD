@@ -1,5 +1,6 @@
 # Auto Spotify
-[watch this repo](https://github.com/user/repository/subscription)
+<button name="button" onclick="http://www.google.com">Click me</button>
+
 Auto Spotify is a Python library for automating various tasks on Spotify. It is built on top of the Spotipy library and uses the Spotify Web API to interact with Spotify.
 
 ## Installation
