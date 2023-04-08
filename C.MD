@@ -1,44 +1,35 @@
-# Usage
+# Auto Spotify
+[watch this repo](https://github.com/user/repository/subscription)
+Auto Spotify is a Python library for automating various tasks on Spotify. It is built on top of the Spotipy library and uses the Spotify Web API to interact with Spotify.
 
-This script can be used to automate various Spotify tasks.
+## Installation
 
-## Getting started
-
-Before running the script, you need to set up the necessary credentials in the `config/credentials.ini` file. The `client_id` and `client_secret` are for Spotify, and the `access_token` is for LyricsGenius.
-
-## Running the script
-
-To run the script, simply execute the `main.py` file with the desired arguments.
-
-### Arguments
-
-The script takes the following arguments:
-
-- `-ps`, `--playlists`: get all playlists attributes.
-- `-s`, `--songs <playlist_name>`: get all songs from a specific playlist.
-- `-l`, `--lyrics`: get the lyrics for the user's currently playing track.
-
-### Examples
-
-Get all playlist attributes:
-
-Here's an example of how you can use the `main.py` script:
+To install the library, clone this repository and run:
 
 ```bash
-python3 main.py -ps
+cd spotify-automation
+./run.sh
+pip install -r requirements.txt
 ```
 
-This will print a table with all your playlists attributes.
+## Configuration
+
+Before using the library, you need to set up the necessary API keys and authentication credentials. See [config.md](./docs/config.md) for instructions on how to do this.
 
 
-Get all songs from a specific playlist:
+## Usage
+
+See [usage.md](./docs/usage.md) for instructions on how to use the library and its various functionalities.
 
 
-```bash
-python3 main.py -s <playlist_name>
-```
 
-Get lyrics for the user's currently playing track:
-```bash
-python3 main.py -l
-```
+## License
+
+This project is licensed under the MIT License - see the `LICENSE` file for details.
+
+
+## Development
+
+This project is still under development and there may be additional features and bug fixes in the future.
+
+
