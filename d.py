@@ -1,101 +1,78 @@
-import random
+import asyncio
+import datetime
 
-import bot.config
-
-import giphy_client
-from giphy_client.rest import ApiException
+from managers.database import add_warn, remove_warn, get_warnings
 
 import discord
 from discord.ext import commands
 
 
-class Giphy(commands.Cog):
-    """The Giphy class is a Discord bot cog that uses the Giphy API to search for and display GIFs in a Discord server."""
-
+class Warn(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.giphy_client = giphy_client.DefaultApi()
-        self.limit = 25
-        self.rating = 'g'
-
-    @commands.group(name='gif', invoke_without_command=True)
-    async def giphy(self, ctx, *, q):
-        try:
-            giphy_api_response = self.giphy_client.gifs_search_get(
-                api_key=bot.config.giphy_api_key(),
-                q=q,
-                limit=self.limit,
-                rating=self.rating
-            )
-
-            giphy_giffs = list(giphy_api_response.data)
-            giff = random.choice(giphy_giffs)
-
-            embed = discord.Embed(title=q)
-            embed.set_image(url=f'https://media.giphy.com/media/{giff.id}/giphy.gif')
-
-            await ctx.channel.send(embed=embed)
-
-        except ApiException as e:
-            print('Exception for the API', e)
-        
-    @giphy.command()
-    async def trending(self, ctx):
-        try:
-            giphy_api_response = self.giphy_client.gifs_trending_get(
-                api_key=bot.config.giphy_api_key(),
-                limit=self.limit,
-            )
-            
-            giphy_giffs = list(giphy_api_response.data)
-            giff = random.choice(giphy_giffs)
-
-            embed = discord.Embed(title='Trending GIF')
-            embed.set_image(url=f'https://media.giphy.com/media/{giff.id}/giphy.gif')
-
-            await ctx.channel.send(embed=embed)
-
-        except ApiException as e:
-            print('Exception for the API', e)
     
-    @giphy.command()
-    async def random(self, ctx):
-        try:
-            giphy_api_response = self.giphy_client.gifs_random_get(
-                api_key=bot.config.giphy_api_key(),
-                rating=self.rating
-            )
+    @commands.command()
+    async def warn(self, ctx, member: discord.Member, reason: str = None):
+        total = await add_warn(
+            user_id=member.id,
+            guild_id=ctx.guild.id,
+            reason=reason
+        )
 
-            random_giff = giphy_api_response.data
+        embed = discord.Embed(color=discord.Color.blurple())
+        embed.set_author(name=f'Warning for - {member}')
+        embed.set_thumbnail(url=member.avatar)
 
-            embed = discord.Embed(title='Trending GIF')
-            embed.set_image(url=f'https://media.giphy.com/media/{random_giff.id}/giphy.gif')
+        embed.add_field(
+            name='Reason:',
+            value=reason,
+            inline=False
+        )
+        embed.add_field(
+            name='Total Amount:',
+            value=total,
+            inline=False
+        )
 
-            await ctx.channel.send(embed=embed)
-
-        except ApiException as e:
-            print('Exception for the API', e)
-    
-    @giphy.command()
-    async def translate(self, ctx, *, s):
-        try:
-            giphy_api_response = self.giphy_client.gifs_translate_get(
-                api_key=bot.config.giphy_api_key(),
-                s=s
-            )
-
-            translated_giff = giphy_api_response.data
-            
-            embed = discord.Embed(title='Translated GIF')
-            embed.set_image(url=f'https://media.giphy.com/media/{translated_giff.id}/giphy.gif')
-
-            await ctx.channel.send(embed=embed)
-
-        except ApiException as e:
-            print('Exception for the API', e)
-
-
-def setup(bot):
-    """ Setup Giphy Module"""
-    bot.add_cog(Giphy(bot))
+        embed.set_footer(
+            text=f'Requested By - {ctx.author}',
+            icon_url=ctx.author.display_avatar
+        )
         
+        warning_log_channel = ctx.guild.get_channel(1107408673808064553)
+
+        await warning_log_channel.send(embed=embed)
+
+        try:
+            await member.send(f"You were warned by **{ctx.author}** in **{ctx.guild.name}**!\nReason: {reason}")
+        except discord.HTTPException:
+            await ctx.send(f'{member.mention}, you were warned by **{ctx.author}**!\nReason: {reason}', delete_after=1.5)
+
+        if total > 3:
+            mute_role = discord.utils.get(ctx.guild.roles, name='muted')
+            if mute_role and mute_role not in member.roles:
+                await member.add_roles(mute_role)
+                try:
+                    await member.send('You have been muted for 30 minutes.')
+                finally:
+                    await ctx.send(f'{member.mention} has been muted for 30 minutes.', delete_after=2)
+
+            await asyncio.sleep(30 * 60) # mutes for 30 minutes
+            await member.remove_roles(mute_role)
+
+    @commands.command()
+    async def removewarn(self, ctx, member: discord.Member, reason: str = None):
+        pass
+
+    @commands.command()
+    async def warns(self, ctx, member: discord.Member):
+        warns = await get_warnings(user_id=member.id, guild_id=ctx.guild.id)
+        if warns:
+            embed = discord.Embed(title=f'{member} Warnings', color=discord.Color.red())
+            for warn in warns:
+                embed.add_field(
+                    name=f':warning: Warning {warn[0]}',
+                    value=f'**Reason:** {warn[2]}\n**Date Issued:** {datetime.datetime.fromtimestamp(warn[3]).strftime("%d-%m-%Y %H:%M")}',
+                    inline=True
+                )
+            await ctx.send(embed=embed)
